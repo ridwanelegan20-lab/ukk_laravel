@@ -1,49 +1,66 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Ubah Data Anggota') }}
-        </h2>
-    </x-slot>
+    <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto min-h-screen">
+        
+        <div class="mb-6 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Edit Profil Anggota</h1>
+                <p class="text-sm text-gray-500 mt-1">Perbarui informasi dasar atau reset kata sandi siswa.</p>
+            </div>
+            <a href="{{ route('admin.members.index') }}" class="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors shadow-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Kembali
+            </a>
+        </div>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <form action="{{ route('admin.members.update', $member->id) }}" method="POST" class="p-6 sm:p-8">
+                @csrf
+                @method('PUT')
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     
-                    <form method="POST" action="{{ route('admin.members.update', $member->id) }}" class="max-w-xl">
-                        @csrf
-                        @method('PUT')
+                    <div class="sm:col-span-2">
+                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" name="name" id="name" value="{{ old('name', $member->name) }}" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors" required>
+                        @error('name') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                    </div>
 
-                        <div class="mb-4">
-                            <x-input-label for="name" :value="__('Nama Lengkap Siswa')" />
-                            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" value="{{ old('name', $member->name) }}" required autofocus />
-                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                        </div>
+                    <div class="sm:col-span-2">
+                        <label for="email" class="block text-sm font-semibold text-gray-700 mb-1">Alamat Email <span class="text-red-500">*</span></label>
+                        <input type="email" name="email" id="email" value="{{ old('email', $member->email) }}" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors" required>
+                        @error('email') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                    </div>
 
-                        <div class="mb-4">
-                            <x-input-label for="email" :value="__('Email')" />
-                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" value="{{ old('email', $member->email) }}" required />
-                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                        </div>
+                    <div class="sm:col-span-2 mt-4">
+                        <h3 class="text-sm font-bold text-gray-900 border-l-4 border-orange-500 pl-3">Reset Kata Sandi (Opsional)</h3>
+                        <p class="text-[11px] text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah kata sandi siswa.</p>
+                    </div>
 
-                        <div class="mb-4">
-                            <x-input-label for="password" :value="__('Kata Sandi Baru (Kosongkan jika tidak ingin mengubah)')" />
-                            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" autocomplete="new-password" />
-                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                        </div>
+                    <div>
+                        <label for="password" class="block text-sm font-semibold text-gray-700 mb-1">Kata Sandi Baru</label>
+                        <input type="password" name="password" id="password" placeholder="••••••••" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        @error('password') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                    </div>
 
-                        <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('admin.members.index') }}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">
-                                Batal
-                            </a>
-                            <x-primary-button>
-                                {{ __('Perbarui Data') }}
-                            </x-primary-button>
-                        </div>
-                    </form>
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-1">Konfirmasi Kata Sandi Baru</label>
+                        <input type="password" name="password_confirmation" id="password_confirmation" placeholder="••••••••" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    </div>
 
                 </div>
-            </div>
+
+                <div class="my-8 border-t border-gray-100"></div>
+
+                <div class="flex items-center justify-end gap-3">
+                    <a href="{{ route('admin.members.index') }}" class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                        Batal
+                    </a>
+                    <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-[#1e4ed8] rounded-lg hover:bg-blue-800 shadow-sm transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </x-app-layout>

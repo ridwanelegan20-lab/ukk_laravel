@@ -1,100 +1,61 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard Peminjaman Siswa') }}
-        </h2>
-    </x-slot>
+    <div class="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen">
+        
+        <div class="mb-8">
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Selamat Datang, {{ Auth::user()->name }}!</h1>
+            <p class="text-sm text-gray-500 mt-1">Dashboard utama perpustakaan digital</p>
+        </div>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="bg-blue-50/70 rounded-2xl p-5 border border-blue-100 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"></path></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 font-medium">Buku Tersedia</p>
+                    <h3 class="text-xl font-bold text-gray-900">1,245</h3>
+                </div>
+            </div>
+            <div class="bg-green-50/70 rounded-2xl p-5 border border-green-100 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white shadow-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 font-medium">Buku Dipinjam</p>
+                    <h3 class="text-xl font-bold text-gray-900">{{ $myTransactions->where('status', 'dipinjam')->count() ?? 0 }}</h3>
+                </div>
+            </div>
+            <div class="bg-orange-50/70 rounded-2xl p-5 border border-orange-100 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-orange-400 flex items-center justify-center text-white shadow-sm">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 font-medium">Buku Terlambat</p>
+                    <h3 class="text-xl font-bold text-gray-900">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-gray-900">Rekomendasi Bacaan</h2>
+                <a href="{{ url('/katalog') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Lihat Semua</a>
+            </div>
             
-            @if(session('success'))
-                <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">{{ session('success') }}</span>
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">{{ session('error') }}</span>
-                </div>
-            @endif
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900 border-b border-gray-200 bg-gray-50 font-bold">
-                        Katalog Buku Tersedia
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                @foreach($books->take(4) as $book)
+                <div class="group cursor-pointer">
+                    <div class="relative aspect-[3/4] bg-gray-100 rounded-xl overflow-hidden mb-3 border border-gray-200 flex items-center justify-center">
+                        @if($book->image)
+    <img src="{{ asset('storage/' . $book->image) }}" alt="{{ $book->title }}" class="absolute inset-0 w-full h-full object-cover">
+@else
+    <span class="text-gray-400 font-bold uppercase tracking-widest text-xs">{{ substr($book->title, 0, 3) }}</span>
+@endif
                     </div>
-                    <div class="px-6 pt-4">
-                    <form method="GET" action="{{ route('dashboard') }}" class="flex w-full">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul buku atau penulis..." class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-l-md shadow-sm w-full text-sm">
-                    <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-r-md text-sm transition">Cari</button>
-                    </form>
+                    <h3 class="text-sm font-bold text-gray-900 line-clamp-1 group-hover:text-blue-600">{{ $book->title }}</h3>
+                    <p class="text-xs text-gray-500 mt-0.5 truncate">{{ $book->author }}</p>
                 </div>
-                    <div class="p-6">
-                        <div class="space-y-4">
-                            @forelse($books as $book)
-                                <div class="border rounded-lg p-4 flex justify-between items-center shadow-sm">
-                                    <div>
-                                        <h3 class="font-bold text-lg">{{ $book->title }}</h3>
-                                        <p class="text-sm text-gray-600">Oleh: {{ $book->author }}</p>
-                                        <p class="text-sm text-blue-600 mt-1">Stok: {{ $book->stock }}</p>
-                                    </div>
-                                    
-                                    <form action="{{ route('transactions.borrow') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="book_id" value="{{ $book->id }}">
-                                        <button type="submit" class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded text-sm transition" onclick="return confirm('Pinjam buku {{ $book->title }}?')">
-                                            Pinjam Buku
-                                        </button>
-                                    </form>
-                                </div>
-                            @empty
-                                <p class="text-gray-500 text-center py-4">Yah, saat ini tidak ada buku yang tersedia untuk dipinjam.</p>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                    <div class="p-6 text-gray-900 border-b border-gray-200 bg-gray-50 font-bold">
-                        Buku yang Saya Pinjam
-                    </div>
-                    <div class="p-6">
-                        <div class="space-y-4">
-                            @forelse($myTransactions as $trx)
-                                <div class="border rounded-lg p-4 shadow-sm {{ $trx->status == 'dikembalikan' ? 'bg-gray-100 opacity-75' : 'bg-white' }}">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-bold">{{ $trx->book->title }}</h3>
-                                            <p class="text-xs text-gray-500 mt-1">Dipinjam: {{ \Carbon\Carbon::parse($trx->borrow_date)->format('d M Y') }}</p>
-                                            
-                                            @if($trx->status == 'dipinjam')
-                                                <span class="inline-block mt-2 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">Sedang Dipinjam</span>
-                                            @else
-                                                <span class="inline-block mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">Dikembalikan pada: {{ \Carbon\Carbon::parse($trx->return_date)->format('d M Y') }}</span>
-                                            @endif
-                                        </div>
-
-                                        @if($trx->status == 'dipinjam')
-                                            <form action="{{ route('transactions.return', $trx->id) }}" method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="bg-green-600 hover:bg-green-800 text-white font-bold py-1 px-3 rounded text-sm transition" onclick="return confirm('Kembalikan buku ini sekarang?')">
-                                                    Kembalikan
-                                                </button>
-                                            </form>
-                                        @endif
-                                    </div>
-                                </div>
-                            @empty
-                                <p class="text-gray-500 text-center py-4">Kamu belum pernah meminjam buku apapun.</p>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-
+                @endforeach
             </div>
         </div>
     </div>

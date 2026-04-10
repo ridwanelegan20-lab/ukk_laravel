@@ -5,87 +5,126 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class MemberController extends Controller
 {
-    // Menampilkan daftar anggota/siswa
+    /**
+     * Menampilkan daftar anggota beserta fitur pencarian & pagination.
+     */
     public function index(Request $request)
     {
+        // Kita hanya mengambil user yang memiliki role 'siswa' (bukan admin)
         $query = User::where('role', 'siswa');
 
-        // Filter berdasarkan nama atau email siswa
-        if ($request->has('search')) {
+        // Logika Fitur Pencarian
+        if ($request->filled('search')) {
             $search = $request->search;
+            // Gunakan kurung tambahan (Closure) agar pencarian tidak merusak filter role='siswa'
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        $members = $query->latest()->get();
+        // Logika Pagination
+        $members = $query->latest()->paginate(10);
+        
+        // Memastikan parameter pencarian tidak hilang saat pindah halaman
+        $members->appends(['search' => $request->search]);
+
         return view('admin.members.index', compact('members'));
     }
 
+    /**
+     * Menampilkan halaman form tambah anggota.
+     */
     public function create()
     {
         return view('admin.members.create');
     }
 
+    /**
+     * Menyimpan data anggota baru ke database.
+     */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+        // Validasi input
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Tetapkan role secara eksplisit
-        $validated['role'] = 'siswa';
-        // Enkripsi kata sandi
-        $validated['password'] = Hash::make($validated['password']);
-
-        User::create($validated);
+        // Simpan ke database dengan role default 'siswa'
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'siswa', // Otomatis jadikan siswa
+        ]);
 
         return redirect()->route('admin.members.index')
-                         ->with('success', 'Anggota baru berhasil didaftarkan.');
+                         ->with('success', 'Anggota baru berhasil didaftarkan!');
     }
 
-    public function edit(User $member)
+    /**
+     * Menampilkan halaman form edit anggota.
+     */
+    public function edit($id)
     {
+        $member = User::findOrFail($id);
         return view('admin.members.edit', compact('member'));
     }
 
-    public function update(Request $request, User $member)
+    /**
+     * Menyimpan perubahan data anggota ke database.
+     */
+    public function update(Request $request, $id)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $member->id,
+        $member = User::findOrFail($id);
+
+        // Validasi input (email boleh sama dengan emailnya sendiri, tapi tidak boleh sama dengan orang lain)
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,'.$member->id],
+        ]);
+
+        // Siapkan data yang akan diupdate
+        $dataToUpdate = [
+            'name' => $request->name,
+            'email' => $request->email,
         ];
 
-        // Validasi password opsional saat update
+        // Jika form password diisi, berarti admin ingin mereset password siswa tersebut
         if ($request->filled('password')) {
-            $rules['password'] = 'string|min:8';
+            $request->validate([
+                'password' => ['confirmed', Rules\Password::defaults()],
+            ]);
+            $dataToUpdate['password'] = Hash::make($request->password);
         }
 
-        $validated = $request->validate($rules);
-
-        if ($request->filled('password')) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']); // Jangan ubah password jika kosong
-        }
-
-        $member->update($validated);
+        $member->update($dataToUpdate);
 
         return redirect()->route('admin.members.index')
-                         ->with('success', 'Data anggota berhasil diperbarui.');
+                         ->with('success', 'Data anggota berhasil diperbarui!');
     }
 
-    public function destroy(User $member)
+    /**
+     * Menghapus anggota dari database.
+     */
+    public function destroy($id)
     {
+        $member = User::findOrFail($id);
+        
+        // Opsional: Pastikan admin tidak bisa menghapus dirinya sendiri dari halaman ini
+        if ($member->role === 'admin') {
+            return back()->with('error', 'Akun Administrator tidak boleh dihapus dari sini!');
+        }
+
         $member->delete();
 
         return redirect()->route('admin.members.index')
-                         ->with('success', 'Data anggota berhasil dihapus.');
+                         ->with('success', 'Anggota berhasil dihapus dari sistem!');
     }
 }
