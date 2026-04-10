@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\User;
@@ -12,26 +13,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Membuat 1 Akun Admin (Untuk kamu gunakan login)
-        User::factory()->create([
+        // 1. Membuat 1 Akun Admin (Tanpa menggunakan Factory/Faker)
+        User::create([
             'name' => 'Administrator Perpus',
             'email' => 'admin@perpus.com',
-            'password' => Hash::make('password123'), // Ingat password ini
+            'password' => Hash::make('password123'), 
             'role' => 'admin',
         ]);
 
-        // 2. Membuat 1 Akun Siswa Spesifik (Untuk uji coba tampilan siswa)
-        User::factory()->create([
+        // 2. Membuat 1 Akun Siswa Spesifik
+        User::create([
             'name' => 'Ridwan Siswa',
             'email' => 'siswa@perpus.com',
-            'password' => Hash::make('password123'), // Password disamakan agar mudah
+            'password' => Hash::make('password123'), 
             'role' => 'siswa',
         ]);
-
-        // 3. (Opsional) Membuat 5 akun Siswa acak (dummy) untuk meramaikan tabel
-        User::factory(5)->create([
-            'password' => Hash::make('password123'),
-            'role' => 'siswa',
-        ]);
+        
+        // Pembuatan 5 akun acak dihapus agar tidak memicu error Faker di server
     }
 }
