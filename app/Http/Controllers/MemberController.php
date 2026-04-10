@@ -9,10 +9,20 @@ use Illuminate\Support\Facades\Hash;
 class MemberController extends Controller
 {
     // Menampilkan daftar anggota/siswa
-    public function index()
+    public function index(Request $request)
     {
-        // Hanya menampilkan user dengan role 'siswa'
-        $members = User::where('role', 'siswa')->latest()->get();
+        $query = User::where('role', 'siswa');
+
+        // Filter berdasarkan nama atau email siswa
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $members = $query->latest()->get();
         return view('admin.members.index', compact('members'));
     }
 

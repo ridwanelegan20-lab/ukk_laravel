@@ -26,6 +26,12 @@
                     <div class="p-6 text-gray-900 border-b border-gray-200 bg-gray-50 font-bold">
                         Katalog Buku Tersedia
                     </div>
+                    <div class="px-6 pt-4">
+                    <form method="GET" action="{{ route('dashboard') }}" class="flex w-full">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul buku atau penulis..." class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-l-md shadow-sm w-full text-sm">
+                    <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white px-3 py-2 rounded-r-md text-sm transition">Cari</button>
+                    </form>
+                </div>
                     <div class="p-6">
                         <div class="space-y-4">
                             @forelse($books as $book)

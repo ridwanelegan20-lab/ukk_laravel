@@ -10,8 +10,15 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     
-                    <div class="mb-4 flex justify-end">
-                        <a href="{{ route('admin.members.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <form method="GET" action="{{ route('admin.members.index') }}" class="flex w-full md:w-1/2">
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email siswa..." class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-l-md shadow-sm w-full">
+                            <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-r-md transition">
+                                Cari
+                            </button>
+                        </form>
+
+                        <a href="{{ route('admin.members.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded whitespace-nowrap">
                             + Tambah Anggota Baru
                         </a>
                     </div>

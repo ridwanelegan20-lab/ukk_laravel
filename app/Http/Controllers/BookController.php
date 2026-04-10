@@ -8,10 +8,18 @@ use Illuminate\Http\Request;
 class BookController extends Controller
 {
     // Menampilkan daftar buku (Read)
-    public function index()
+   public function index(Request $request)
     {
-        // Mengambil semua data buku terbaru
-        $books = Book::latest()->get(); 
+        $query = Book::query();
+
+        // Jika ada input pencarian, filter berdasarkan judul atau penulis
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where('title', 'like', "%{$search}%")
+                  ->orWhere('author', 'like', "%{$search}%");
+        }
+
+        $books = $query->latest()->get(); 
         return view('admin.books.index', compact('books'));
     }
 

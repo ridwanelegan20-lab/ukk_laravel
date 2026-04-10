@@ -1,27 +1,69 @@
 <?php
+
 use App\Models\Book;
 use App\Models\Transaction;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\MemberController;
-use App\Http\Middleware\RoleMiddleware;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\RoleMiddleware;
+use Illuminate\Support\Facades\Route;
+
+// TAMBAHKAN DUA BARIS INI:
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
+// ------------------------------------------------------------------
+// 1. RUTE DASHBOARD SISWA (Sudah digabung & ditambah fitur Search)
+// ------------------------------------------------------------------
+Route::get('/dashboard', function (Request $request) {
+    // Jika admin nyasar ke sini, kembalikan ke dashboard admin
+    if (Auth::user()->role === 'admin') {
+        return redirect()->route('admin.books.index');
+    }
+
+    // Query dasar: Ambil data buku yang stoknya masih ada (> 0)
+    $bookQuery = Book::where('stock', '>', 0);
+    
+    // Fitur pencarian untuk katalog siswa
+    if ($request->has('search') && $request->search != '') {
+        $search = $request->search;
+        $bookQuery->where(function($q) use ($search) {
+            $q->where('title', 'like', "%{$search}%")
+              ->orWhere('author', 'like', "%{$search}%");
+        });
+    }
+    
+    // Eksekusi query buku (tampilkan yang terbaru)
+    $books = $bookQuery->latest()->get();
+    
+    // Ambil data transaksi milik siswa yang sedang login
+    $myTransactions = Transaction::where('user_id', Auth::id())
+                                 ->with('book') // Load relasi buku
+                                 ->latest()
+                                 ->get();
+
+    return view('dashboard', compact('books', 'myTransactions'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+
+// ------------------------------------------------------------------
+// 2. RUTE PROFIL BAWAAN BREEZE
+// ------------------------------------------------------------------
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-// Rute khusus untuk Admin
+
+
+// ------------------------------------------------------------------
+// 3. RUTE KHUSUS ADMIN (Kelola Buku, Anggota, Transaksi)
+// ------------------------------------------------------------------
 Route::middleware(['auth', RoleMiddleware::class.':admin'])
     ->prefix('admin')
     ->name('admin.')
@@ -32,27 +74,15 @@ Route::middleware(['auth', RoleMiddleware::class.':admin'])
     
     // Menghasilkan rute: admin.members.index, create, store, edit, update, destroy
     Route::resource('members', MemberController::class);
-});
-Route::get('/dashboard', function () {
-    // Jika admin nyasar ke sini, kembalikan ke habitatnya
-    if (Auth::user()->role === 'admin') {
-        return redirect()->route('admin.books.index');
-    }
-
-    // Ambil data buku yang stoknya masih ada (> 0)
-    $books = Book::where('stock', '>', 0)->latest()->get();
     
-    // Ambil data transaksi milik siswa yang sedang login
-    $myTransactions = Transaction::where('user_id', Auth::id())
-                                 ->with('book') // Load relasi buku agar query lebih efisien
-                                 ->latest()
-                                 ->get();
-
-    return view('dashboard', compact('books', 'myTransactions'));
-})->middleware(['auth', 'verified'])->name('dashboard');
+    // Rute riwayat transaksi untuk admin
+    Route::get('transactions', [TransactionController::class, 'adminIndex'])->name('transactions.index');
+});
 
 
-// 2. Rute Aksi Peminjaman dan Pengembalian (Khusus Siswa yang Login)
+// ------------------------------------------------------------------
+// 4. RUTE TRANSAKSI PEMINJAMAN & PENGEMBALIAN (Siswa)
+// ------------------------------------------------------------------
 Route::middleware(['auth'])->group(function () {
     Route::post('/transactions/borrow', [TransactionController::class, 'borrow'])->name('transactions.borrow');
     Route::put('/transactions/return/{id}', [TransactionController::class, 'returnBook'])->name('transactions.return');

@@ -11,6 +11,15 @@ use Carbon\Carbon;
 
 class TransactionController extends Controller
 {
+    // Fungsi untuk menampilkan seluruh transaksi di Dashboard Admin
+    public function adminIndex()
+    {
+        // Mengambil semua transaksi, diurutkan dari yang terbaru, 
+        // serta memuat relasi 'user' dan 'book' agar meringankan kerja database
+        $transactions = Transaction::with(['user', 'book'])->latest()->get();
+        
+        return view('admin.transactions.index', compact('transactions'));
+    }
     // Fungsi untuk Siswa meminjam buku
     public function borrow(Request $request)
     {
