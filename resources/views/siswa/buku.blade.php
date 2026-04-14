@@ -43,8 +43,12 @@
 </td>
                             <td class="px-6 py-4 font-bold text-gray-900">{{ $book->title }}</td>
                             <td class="px-6 py-4">{{ $book->author }}</td>
-                            <td class="px-6 py-4"><span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-1 rounded border border-blue-100">Fiksi</span></td>
-                            <td class="px-6 py-4">2023</td>
+                            <td class="px-6 py-4">
+    <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-1 rounded border border-blue-100">
+        {{ $book->category->name ?? 'Tanpa Kategori' }}
+    </span>
+</td>
+<td class="px-6 py-4">{{ $book->year ?? '-' }}</td>
                             <td class="px-6 py-4 text-center">
                                 <a href="{{ route('transactions.borrowForm', $book->id) }}" class="inline-block text-xs font-medium text-white bg-[#1e4ed8] px-4 py-1.5 rounded-lg hover:bg-blue-800 transition text-center">
                                     Pinjam

@@ -65,8 +65,11 @@
                     
                     <select name="status" onchange="this.form.submit()" class="block w-full sm:w-40 py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-600 cursor-pointer">
                         <option value="Semua Status" {{ request('status') == 'Semua Status' ? 'selected' : '' }}>Semua Status</option>
+                        <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu ACC Pinjam</option>
+                        <option value="menunggu_pengembalian" {{ request('status') == 'menunggu_pengembalian' ? 'selected' : '' }}>Menunggu ACC Kembali</option>
                         <option value="dipinjam" {{ request('status') == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
                         <option value="dikembalikan" {{ request('status') == 'dikembalikan' ? 'selected' : '' }}>Dikembalikan</option>
+                        <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                     </select>
                 </form>
 
@@ -86,6 +89,7 @@
                             <th scope="col" class="px-6 py-4 font-medium">Tanggal Pinjam</th>
                             <th scope="col" class="px-6 py-4 font-medium">Tanggal Kembali</th>
                             <th scope="col" class="px-6 py-4 font-medium">Status</th>
+                            <th scope="col" class="px-6 py-4 font-medium text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -111,18 +115,45 @@
                                 </td>
                                 
                                 <td class="px-6 py-4">
-                                    @if($trx->status === 'dipinjam')
-                                        <span class="bg-orange-100 text-orange-700 text-[11px] font-bold px-3 py-1 rounded-md border border-orange-200">Dipinjam</span>
-                                    @else
+                                    @if($trx->status === 'menunggu')
+                                        <span class="bg-yellow-100 text-yellow-700 text-[11px] font-bold px-3 py-1 rounded-md border border-yellow-200 shadow-sm">Menunggu Pinjam</span>
+                                    @elseif($trx->status === 'menunggu_pengembalian')
+                                        <span class="bg-purple-100 text-purple-700 text-[11px] font-bold px-3 py-1 rounded-md border border-purple-200 shadow-sm">Proses Kembali</span>
+                                    @elseif($trx->status === 'dipinjam')
+                                        <span class="bg-blue-100 text-blue-700 text-[11px] font-bold px-3 py-1 rounded-md border border-blue-200">Sedang Dipinjam</span>
+                                    @elseif($trx->status === 'dikembalikan')
                                         <span class="bg-green-100 text-green-700 text-[11px] font-bold px-3 py-1 rounded-md border border-green-200">Dikembalikan</span>
+                                    @elseif($trx->status === 'ditolak')
+                                        <span class="bg-red-100 text-red-700 text-[11px] font-bold px-3 py-1 rounded-md border border-red-200">Ditolak</span>
+                                    @endif
+                                </td>
+                                
+                                <td class="px-6 py-4 flex items-center justify-center gap-2">
+                                    @if($trx->status == 'menunggu')
+                                        <form action="{{ route('admin.transactions.approve', $trx->id) }}" method="POST" class="inline">
+                                            @csrf @method('PUT')
+                                            <button type="submit" class="text-[11px] font-bold text-white bg-green-500 hover:bg-green-600 px-3 py-1.5 rounded-md transition-colors shadow-sm" onclick="return confirm('Yakin ingin menyetujui peminjaman buku ini?')">ACC</button>
+                                        </form>
+                                        <form action="{{ route('admin.transactions.reject', $trx->id) }}" method="POST" class="inline">
+                                            @csrf @method('PUT')
+                                            <button type="submit" class="text-[11px] font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-md transition-colors" onclick="return confirm('Yakin ingin menolak peminjaman ini?')">Tolak</button>
+                                        </form>
+                                    @elseif($trx->status == 'menunggu_pengembalian')
+                                        <form action="{{ route('admin.transactions.approveReturn', $trx->id) }}" method="POST" class="inline">
+                                            @csrf @method('PUT')
+                                            <button type="submit" class="text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-md transition-colors shadow-sm" onclick="return confirm('Apakah buku fisik sudah Anda terima dan kondisinya baik?')">
+                                                Terima Buku
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-[10px] text-gray-400 italic bg-gray-50 px-2 py-1 rounded border border-gray-100">Selesai</span>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
                                     <div class="flex flex-col items-center justify-center">
-                                        <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                                         <p>Belum ada riwayat transaksi peminjaman.</p>
                                     </div>
                                 </td>

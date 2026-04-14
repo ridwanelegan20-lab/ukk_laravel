@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Http;
 
 use App\Models\Book;
 use App\Models\Transaction;
@@ -40,78 +41,117 @@ class TransactionController extends Controller
         $todayTransactions = Transaction::whereDate('created_at', Carbon::today())->count();
 
         return view('admin.transactions.index', compact(
-            'transactions', 
-            'totalTransactions', 
-            'activeBorrow', 
-            'returnedBooks', 
-            'todayTransactions'
+            'transactions', 'totalTransactions', 'activeBorrow', 'returnedBooks', 'todayTransactions'
         ));
     }
 
     // ====================================================================
     // BAGIAN SISWA: Logika Pinjam dan Kembali
     // ====================================================================
-
-    // 1. Menampilkan Halaman Form Pinjam
     public function borrowForm($id)
     {
         $book = Book::findOrFail($id);
-
         if ($book->stock <= 0) {
             return redirect()->back()->with('error', 'Maaf, stok buku ini sedang kosong.');
         }
-
         return view('siswa.pinjam-form', compact('book'));
     }
 
-    // 2. Memproses Data Peminjaman dari Form
     public function borrow(Request $request)
     {
-        $request->validate([
-            'book_id' => 'required|exists:books,id',
-            'kelas' => 'required|string|max:50',
-            'nomor_hp' => 'required|string|max:20',
-            'return_date' => 'required|date|after_or_equal:today|before_or_equal:+7 days',
-        ], [
-            'return_date.before_or_equal' => 'Maksimal waktu peminjaman adalah 7 hari.',
-        ]);
-
-        $book = Book::findOrFail($request->book_id);
+        $request->validate(['book_id' => 'required|exists:books,id']);
+        $user = auth()->user();
+        $book = \App\Models\Book::findOrFail($request->book_id);
 
         if ($book->stock <= 0) {
-            return redirect('/katalog')->with('error', 'Maaf, stok buku sedang kosong.');
+            return redirect()->back()->with('error', 'Maaf, stok habis.');
         }
 
+        $tanggalPinjam = Carbon::now();
+        $batasKembali = Carbon::now()->addDays(7); 
+
         Transaction::create([
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
             'book_id' => $book->id,
-            'borrow_date' => Carbon::now(),
-            'return_date' => $request->return_date,
-            'status' => 'dipinjam'
+            'borrow_date' => $tanggalPinjam,
+            'return_date' => $batasKembali,
+            'status' => 'menunggu' 
         ]);
 
         $book->decrement('stock');
 
-        return redirect('/riwayat-saya')->with('success', 'Form berhasil dikirim. Buku siap diambil!');
+        $pesan = "Halo *{$user->name}*! 👋\n\nPengajuan peminjaman untuk buku *{$book->title}* telah masuk.\n\n⏳ *Status: MENUNGGU KONFIRMASI ADMIN*\n\nMohon ditunggu ya! 🚀";
+        $this->kirimWA($user->phone_number, $pesan);
+
+        return redirect()->route('dashboard')->with('success', 'Pengajuan berhasil dikirim! Menunggu persetujuan Admin.');
     }
 
-    // 3. Fungsi untuk Siswa mengembalikan buku (Ini yang sebelumnya hilang)
+    // UBAHAN BARU: Siswa minta kembalikan buku (Belum di-ACC Admin)
     public function returnBook($id)
     {
-        $transaction = Transaction::where('id', $id)
-            ->where('user_id', Auth::id())
-            ->where('status', 'dipinjam')
-            ->firstOrFail();
+        $transaction = Transaction::where('id', $id)->where('user_id', Auth::id())->where('status', 'dipinjam')->firstOrFail();
 
-        // Update status transaksi
-        $transaction->update([
-            'return_date' => Carbon::now(),
-            'status' => 'dikembalikan'
-        ]);
+        // Status diubah jadi menunggu pengembalian (Stok BELUM bertambah)
+        $transaction->update(['status' => 'menunggu_pengembalian']);
 
-        // Kembalikan stok buku
+        $pesan = "Halo *{$transaction->user->name}*!\n\nAnda baru saja menekan tombol Kembalikan untuk buku *{$transaction->book->title}*.\n\n🚶‍♂️ Silakan bawa fisik buku tersebut dan serahkan kepada Admin/Petugas Perpustakaan agar statusnya diperbarui menjadi Selesai.";
+        $this->kirimWA($transaction->user->phone_number, $pesan);
+
+        return back()->with('success', 'Silakan serahkan buku fisik ke Admin untuk menyelesaikan pengembalian!');
+    }
+
+    // ====================================================================
+    // BAGIAN ADMIN: Logika ACC Pinjam, Tolak, dan Terima Pengembalian
+    // ====================================================================
+    public function approve($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update(['status' => 'dipinjam']);
+
+        $pesan = "HORE! 🎉\n\nPengajuan peminjaman buku *{$transaction->book->title}* Anda telah *DISETUJUI*.\n\nSilakan datang ke perpustakaan untuk mengambil bukunya. Selamat membaca!";
+        $this->kirimWA($transaction->user->phone_number, $pesan);
+
+        return back()->with('success', 'Peminjaman di-ACC!');
+    }
+
+    public function reject($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        $transaction->update(['status' => 'ditolak']);
         $transaction->book->increment('stock');
 
-        return back()->with('success', 'Buku berhasil dikembalikan!');
+        $pesan = "Mohon maaf 🙏\n\nPengajuan peminjaman buku *{$transaction->book->title}* *DITOLAK* oleh Admin. Silakan temui petugas.";
+        $this->kirimWA($transaction->user->phone_number, $pesan);
+
+        return back()->with('success', 'Peminjaman ditolak!');
+    }
+
+    // UBAHAN BARU: Admin menerima fisik buku dan ACC Pengembalian
+    public function approveReturn($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        
+        $transaction->update([
+            'return_date' => Carbon::now(), // Catat tanggal pengembalian aslinya
+            'status' => 'dikembalikan'
+        ]);
+        
+        // Stok buku baru dikembalikan ke rak
+        $transaction->book->increment('stock');
+
+        $pesan = "Terima kasih! 🌟\n\nBuku *{$transaction->book->title}* telah diterima oleh Admin. Proses peminjaman Anda telah *SELESAI*.\n\nJangan lupa pinjam buku lainnya ya!";
+        $this->kirimWA($transaction->user->phone_number, $pesan);
+
+        return back()->with('success', 'Pengembalian buku berhasil dikonfirmasi!');
+    }
+
+    // FUNGSI BANTUAN UNTUK MENGIRIM WA AGAR KODE LEBIH RAPI
+    private function kirimWA($nomorTujuan, $pesan) {
+        if (!empty($nomorTujuan)) {
+            try {
+                Http::withHeaders(['Authorization' => 'vcxXUhLf2yRFFRUYS2Fp'])
+                    ->post('https://api.fonnte.com/send', ['target' => $nomorTujuan, 'message' => $pesan]);
+            } catch (\Exception $e) { \Log::error('WA Gagal: ' . $e->getMessage()); }
+        }
     }
 }

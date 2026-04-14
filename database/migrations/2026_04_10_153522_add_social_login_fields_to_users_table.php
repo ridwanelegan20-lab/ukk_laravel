@@ -9,12 +9,11 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+  public function up(): void
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->string('password')->nullable()->change(); // Ubah password jadi boleh kosong
-        $table->string('google_id')->nullable();
-        $table->string('facebook_id')->nullable();
+        $table->string('provider_name')->nullable()->after('password');
+        $table->string('provider_id')->nullable()->after('provider_name');
     });
 }
 

@@ -66,6 +66,17 @@
                     </div>
                     @error('email') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
+                <div>
+    <label for="phone_number" class="block text-sm font-semibold text-gray-700 mb-1">Nomor WhatsApp <span class="text-red-500">*</span></label>
+    <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <span class="text-gray-400 text-xs font-bold">+62</span>
+        </div>
+        <input id="phone_number" type="text" name="phone_number" value="{{ old('phone_number') }}" placeholder="81234567890" required class="block w-full pl-12 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-blue-500 focus:border-blue-500 transition-colors">
+    </div>
+    <p class="mt-1 text-[10px] text-gray-400">Gunakan format 8xxx (tanpa angka 0 di depan).</p>
+    @error('phone_number') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+</div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -33,7 +34,8 @@ class BookController extends Controller
      */
     public function create()
     {
-        return view('admin.books.create');
+        $categories = Category::all(); 
+        return view('admin.books.create', compact('categories'));
     }
 
     /**
@@ -41,46 +43,40 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi input dari form
+        // 1. Validasi Inputan
         $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'year' => 'nullable|integer',
             'stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ], [
-            'title.required' => 'Judul buku wajib diisi.',
-            'author.required' => 'Nama penulis wajib diisi.',
-            'stock.required' => 'Jumlah stok wajib diisi.',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
         ]);
 
-        $data = $request->all();
+        // 2. Ambil semua data kecuali gambar
+        $data = $request->except('image');
 
-        // Logika Upload Gambar
+        // 3. Logika Menyimpan Gambar
         if ($request->hasFile('image')) {
-        // Simpan file ke folder storage/app/public/books
-        $imagePath = $request->file('image')->store('books', 'public');
-        $data['image'] = $imagePath;
+            // Simpan gambar ke folder storage/app/public/books
+            // File akan otomatis diberi nama unik oleh Laravel
+            $data['image'] = $request->file('image')->store('books', 'public');
+        }
+
+        // 4. Simpan ke database
+        Book::create($data);
+
+        return redirect()->route('admin.books.index')->with('success', 'Buku baru dan sampulnya berhasil ditambahkan!');
     }
-
-        // 2. Simpan ke database
-        Book::create([
-            'title' => $request->title,
-            'author' => $request->author,
-            'stock' => $request->stock,
-        ]);
-
-        // 3. Kembalikan ke halaman daftar buku dengan pesan sukses
-        return redirect()->route('admin.books.index')
-                         ->with('success', 'Buku baru berhasil ditambahkan ke katalog!');
-    }
-
     /**
      * Menampilkan halaman form edit buku.
      */
     public function edit($id)
     {
         $book = Book::findOrFail($id);
-        return view('admin.books.edit', compact('book'));
+        // Ambil semua kategori juga untuk halaman edit
+        $categories = Category::all(); 
+        return view('admin.books.edit', compact('book', 'categories'));
     }
 
     /**

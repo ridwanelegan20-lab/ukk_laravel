@@ -31,14 +31,15 @@
                     </div>
 
                     <div>
-                        <label for="category" class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
-                        <select name="category" id="category" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer">
+                        <label for="category_id" class="block text-sm font-semibold text-gray-700 mb-1">Kategori <span class="text-red-500">*</span></label>
+                        <select name="category_id" id="category_id" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer" required>
                             <option value="">Pilih Kategori</option>
-                            <option value="Fiksi">Fiksi</option>
-                            <option value="Sejarah">Sejarah</option>
-                            <option value="Motivasi">Motivasi</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
                         </select>
-                        <p class="mt-1 text-[10px] text-gray-400">Pilihan ini saat ini hanya sebagai pelengkap tampilan.</p>
                     </div>
 
                     <div>

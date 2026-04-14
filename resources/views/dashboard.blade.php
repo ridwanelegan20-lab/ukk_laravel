@@ -7,33 +7,37 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            
             <div class="bg-blue-50/70 rounded-2xl p-5 border border-blue-100 flex items-center gap-4">
                 <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-sm">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"></path></svg>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Buku Tersedia</p>
-                    <h3 class="text-xl font-bold text-gray-900">1,245</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ \App\Models\Book::sum('stock') }}</h3>
                 </div>
             </div>
+
             <div class="bg-green-50/70 rounded-2xl p-5 border border-green-100 flex items-center gap-4">
                 <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white shadow-sm">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Buku Dipinjam</p>
-                    <h3 class="text-xl font-bold text-gray-900">{{ $myTransactions->where('status', 'dipinjam')->count() ?? 0 }}</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ $myTransactions->whereIn('status', ['dipinjam', 'menunggu_pengembalian'])->count() }}</h3>
                 </div>
             </div>
+
             <div class="bg-orange-50/70 rounded-2xl p-5 border border-orange-100 flex items-center gap-4">
                 <div class="w-12 h-12 rounded-full bg-orange-400 flex items-center justify-center text-white shadow-sm">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Buku Terlambat</p>
-                    <h3 class="text-xl font-bold text-gray-900">0</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ $myTransactions->whereIn('status', ['dipinjam', 'menunggu_pengembalian'])->where('return_date', '<', now())->count() }}</h3>
                 </div>
             </div>
+            
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

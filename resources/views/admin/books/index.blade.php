@@ -96,23 +96,27 @@
                                 <td class="px-6 py-4 text-gray-500">{{ $index + 1 }}</td>
                                 
                                 <td class="px-6 py-4">
-                                    @if($book->image)
-                                        <img src="{{ asset('storage/' . $book->image) }}" alt="Sampul" class="w-10 h-14 rounded object-cover shadow-sm border border-gray-200">
-                                    @else
-                                        <div class="w-10 h-14 bg-gradient-to-br from-gray-200 to-gray-300 rounded shadow-sm flex items-center justify-center">
-                                            <span class="text-[9px] text-gray-500 font-bold uppercase">{{ substr($book->title, 0, 3) }}</span>
-                                        </div>
-                                    @endif
-                                </td>
+    @if($book->image)
+        <img src="{{ asset('storage/' . $book->image) }}" alt="Sampul {{ $book->title }}" class="w-12 h-16 object-cover rounded shadow-sm border border-gray-200">
+    @else
+        <div class="w-12 h-16 bg-gray-100 rounded flex items-center justify-center border border-gray-200 shadow-sm">
+            <span class="text-[10px] text-gray-400 font-bold uppercase">{{ substr($book->title, 0, 3) }}</span>
+        </div>
+    @endif
+</td>
                                 <td class="px-6 py-4 font-medium text-gray-900">{{ $book->title }}</td>
                                 <td class="px-6 py-4">{{ $book->author }}</td>
                                 
                                 <td class="px-6 py-4">
-                                    <span class="bg-blue-50 text-blue-600 text-[11px] font-medium px-2.5 py-1 rounded-md border border-blue-100">Fiksi</span>
-                                </td>
+    <span class="bg-blue-50 text-blue-600 text-[11px] font-medium px-2.5 py-1 rounded-md border border-blue-100">
+        {{ $book->category->name ?? 'Tanpa Kategori' }}
+    </span>
+</td>
                                 
-                                <td class="px-6 py-4">2023</td> <td class="px-6 py-4 font-medium">{{ $book->stock }}</td>
-                                
+<td class="px-6 py-4">{{ $book->year ?? '-' }}</td> 
+
+<td class="px-6 py-4 font-medium">{{ $book->stock }}</td>
+
                                 <td class="px-6 py-4 flex items-center justify-center gap-2 mt-2">
                                     <a href="{{ route('admin.books.edit', $book->id) }}" class="text-[11px] font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md border border-blue-100 transition-colors">
                                         Edit

@@ -13,7 +13,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Total Buku</p>
-                    <h3 class="text-xl font-bold text-gray-900">1,245</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format($totalBooks) }}</h3>
                     <p class="text-[10px] text-gray-400 mt-0.5">Semua koleksi</p>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Total Anggota</p>
-                    <h3 class="text-xl font-bold text-gray-900">356</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format($totalMembers) }}</h3>
                     <p class="text-[10px] text-gray-400 mt-0.5">Anggota terdaftar</p>
                 </div>
             </div>
@@ -35,7 +35,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Dipinjam</p>
-                    <h3 class="text-xl font-bold text-gray-900">100</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format($borrowedBooks) }}</h3>
                     <p class="text-[10px] text-gray-400 mt-0.5">Sedang dipinjam</p>
                 </div>
             </div>
@@ -46,7 +46,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Dipinjam Hari Ini</p>
-                    <h3 class="text-xl font-bold text-gray-900">17</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format($transactionsToday) }}</h3>
                     <p class="text-[10px] text-gray-400 mt-0.5">Transaksi hari ini</p>
                 </div>
             </div>
@@ -105,20 +105,32 @@
                 </div>
 
                 <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
-                            R
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-bold text-gray-900 truncate">Ridwan Siswa</p>
-                            <p class="text-[11px] text-gray-500 truncate">Laskar Pelangi</p>
-                        </div>
-                        <div class="text-right shrink-0">
-                            <span class="inline-block bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-md">Dipinjam</span>
-                            <p class="text-[9px] text-gray-400 mt-0.5">10 Apr 2026</p>
-                        </div>
-                    </div>
-
+    @forelse($recentTransactions as $transaction)
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0 uppercase">
+            {{ substr($transaction->user->name, 0, 1) }}
+        </div>
+        
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-gray-900 truncate">{{ $transaction->user->name }}</p>
+            <p class="text-[11px] text-gray-500 truncate">{{ $transaction->book->title }}</p>
+        </div>
+        
+        <div class="text-right shrink-0">
+            @if($transaction->status == 'dipinjam')
+                <span class="inline-block bg-orange-100 text-orange-700 text-[10px] font-bold px-2 py-0.5 rounded-md">Dipinjam</span>
+            @else
+                <span class="inline-block bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-md">Dikembalikan</span>
+            @endif
+            <p class="text-[9px] text-gray-400 mt-0.5">{{ $transaction->created_at->format('d M Y') }}</p>
+        </div>
+    </div>
+    @empty
+    <div class="text-center py-4">
+        <p class="text-xs text-gray-500">Belum ada riwayat transaksi.</p>
+    </div>
+    @endforelse
+</div>
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 font-bold shrink-0">
                             S

@@ -102,7 +102,17 @@ Route::middleware(['auth', RoleMiddleware::class.':admin'])
         
     Route::resource('books', BookController::class);
     Route::resource('members', MemberController::class);
+    
+    // --- Rute Transaksi Admin ---
     Route::get('transactions', [TransactionController::class, 'adminIndex'])->name('transactions.index');
+    Route::put('transactions/{id}/approve', [TransactionController::class, 'approve'])->name('transactions.approve');
+    Route::put('transactions/{id}/reject', [TransactionController::class, 'reject'])->name('transactions.reject');
+    Route::put('transactions/{id}/approve-return', [TransactionController::class, 'approveReturn'])->name('transactions.approveReturn');
+    
+    // --- CRUD Kategori ---
+    Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+    Route::post('/categories', [App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
+    Route::delete('/categories/{id}', [App\Http\Controllers\CategoryController::class, 'destroy'])->name('categories.destroy');
 });
 
 // ==================================================================

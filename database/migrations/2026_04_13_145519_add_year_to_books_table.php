@@ -6,19 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::table('books', function (Blueprint $table) {
-            // Menambahkan kolom 'image' yang posisinya setelah kolom 'author'
-            // nullable() artinya kolom ini boleh kosong jika buku tidak ada gambarnya
-            $table->string('image')->nullable()->after('author'); 
+            // Menambahkan kolom year (tipe integer) setelah kolom category_id
+            $table->integer('year')->nullable()->after('category_id');
         });
     }
 
     public function down(): void
     {
         Schema::table('books', function (Blueprint $table) {
-            $table->dropColumn('image');
+            // Untuk menghapus kolom jika migrasi di-rollback
+            $table->dropColumn('year');
         });
     }
 };
