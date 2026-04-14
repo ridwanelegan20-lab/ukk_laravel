@@ -13,8 +13,8 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Total Buku</p>
-                    <h3 class="text-xl font-bold text-gray-900">1,245</h3>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Semua koleksi</p>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format(\App\Models\Book::count()) }}</h3>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Semua judul koleksi</p>
                 </div>
             </div>
 
@@ -24,8 +24,8 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Tersedia</p>
-                    <h3 class="text-xl font-bold text-gray-900">1,120</h3>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Siap dipinjam</p>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format(\App\Models\Book::sum('stock')) }}</h3>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Buku di dalam rak</p>
                 </div>
             </div>
 
@@ -35,8 +35,8 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Dipinjam</p>
-                    <h3 class="text-xl font-bold text-gray-900">125</h3>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Sedang dipinjam</p>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format(\App\Models\Transaction::whereIn('status', ['dipinjam', 'menunggu_pengembalian'])->count()) }}</h3>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Buku di tangan siswa</p>
                 </div>
             </div>
 
@@ -46,28 +46,34 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Kategori</p>
-                    <h3 class="text-xl font-bold text-gray-900">12</h3>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Jenis kategori</p>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format(\App\Models\Category::count()) }}</h3>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Jenis kategori tercatat</p>
                 </div>
             </div>
         </div>
-
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             
             <div class="p-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white">
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <form method="GET" action="{{ route('admin.books.index') }}" class="relative w-full sm:w-64">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        </div>
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul atau penulis buku..." class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50 transition-colors">
-                    </form>
                     
-                    <select class="block w-full sm:w-40 py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-600 cursor-pointer">
-                        <option>Semua Kategori</option>
-                        <option>Fiksi</option>
-                        <option>Sejarah</option>
-                    </select>
+                    <form method="GET" action="{{ route('admin.books.index') }}" class="flex flex-col sm:flex-row gap-3 w-full" id="filterForm">
+                        <div class="relative w-full sm:w-64">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul atau penulis buku..." class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50 transition-colors">
+                        </div>
+                        
+                        <select name="category" onchange="document.getElementById('filterForm').submit();" class="block w-full sm:w-40 py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-600 cursor-pointer">
+                            <option value="">Semua Kategori</option>
+                            @foreach(\App\Models\Category::all() as $cat)
+                                <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                                    {{ $cat->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </form>
+
                 </div>
 
                 <a href="{{ route('admin.books.create') }}" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#1e4ed8] hover:bg-blue-800 text-white font-medium py-2 px-5 rounded-lg text-sm transition-colors shadow-sm">
@@ -96,26 +102,33 @@
                                 <td class="px-6 py-4 text-gray-500">{{ $index + 1 }}</td>
                                 
                                 <td class="px-6 py-4">
-    @if($book->image)
-        <img src="{{ asset('storage/' . $book->image) }}" alt="Sampul {{ $book->title }}" class="w-12 h-16 object-cover rounded shadow-sm border border-gray-200">
-    @else
-        <div class="w-12 h-16 bg-gray-100 rounded flex items-center justify-center border border-gray-200 shadow-sm">
-            <span class="text-[10px] text-gray-400 font-bold uppercase">{{ substr($book->title, 0, 3) }}</span>
-        </div>
-    @endif
-</td>
+                                    @if($book->image)
+                                        <img src="{{ asset('storage/' . $book->image) }}" alt="Sampul {{ $book->title }}" class="w-12 h-16 object-cover rounded shadow-sm border border-gray-200">
+                                    @else
+                                        <div class="w-12 h-16 bg-gray-100 rounded flex items-center justify-center border border-gray-200 shadow-sm">
+                                            <span class="text-[10px] text-gray-400 font-bold uppercase">{{ substr($book->title, 0, 3) }}</span>
+                                        </div>
+                                    @endif
+                                </td>
+                                
                                 <td class="px-6 py-4 font-medium text-gray-900">{{ $book->title }}</td>
                                 <td class="px-6 py-4">{{ $book->author }}</td>
                                 
                                 <td class="px-6 py-4">
-    <span class="bg-blue-50 text-blue-600 text-[11px] font-medium px-2.5 py-1 rounded-md border border-blue-100">
-        {{ $book->category->name ?? 'Tanpa Kategori' }}
-    </span>
-</td>
+                                    <span class="bg-blue-50 text-blue-600 text-[11px] font-medium px-2.5 py-1 rounded-md border border-blue-100">
+                                        {{ $book->category->name ?? 'Tanpa Kategori' }}
+                                    </span>
+                                </td>
                                 
-<td class="px-6 py-4">{{ $book->year ?? '-' }}</td> 
+                                <td class="px-6 py-4">{{ $book->year ?? '-' }}</td> 
 
-<td class="px-6 py-4 font-medium">{{ $book->stock }}</td>
+                                <td class="px-6 py-4 font-medium">
+                                    @if($book->stock > 0)
+                                        {{ $book->stock }}
+                                    @else
+                                        <span class="text-red-500 font-bold">Habis</span>
+                                    @endif
+                                </td>
 
                                 <td class="px-6 py-4 flex items-center justify-center gap-2 mt-2">
                                     <a href="{{ route('admin.books.edit', $book->id) }}" class="text-[11px] font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md border border-blue-100 transition-colors">

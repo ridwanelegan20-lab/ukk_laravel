@@ -35,22 +35,18 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         <span class="text-sm font-medium">Dashboard</span>
                     </a>
-
                     <a href="{{ route('admin.books.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.books.*') ? 'bg-[#2563eb] text-white shadow-md' : 'text-blue-100 hover:bg-white/10' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                         <span class="text-sm font-medium">Kelola Buku</span>
                     </a>
-
                     <a href="{{ route('admin.categories.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.categories.*') ? 'bg-[#2563eb] text-white shadow-md' : 'text-blue-100 hover:bg-white/10' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                         <span class="text-sm font-medium">Kategori Buku</span>
                     </a>
-
                     <a href="{{ route('admin.members.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.members.*') ? 'bg-[#2563eb] text-white shadow-md' : 'text-blue-100 hover:bg-white/10' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         <span class="text-sm font-medium">Kelola Anggota</span>
                     </a>
-
                     <a href="{{ route('admin.transactions.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.transactions.*') ? 'bg-[#2563eb] text-white shadow-md' : 'text-blue-100 hover:bg-white/10' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span class="text-sm font-medium">Riwayat Transaksi</span>
@@ -61,17 +57,14 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         <span class="text-sm font-medium">Dashboard Utama</span>
                     </a>
-
                     <a href="{{ url('/katalog') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 {{ request()->is('katalog') ? 'bg-[#2563eb] text-white shadow-md' : 'text-blue-100 hover:bg-white/10' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                         <span class="text-sm font-medium">Katalog Buku</span>
                     </a>
-
                     <a href="{{ url('/riwayat-saya') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 {{ request()->is('riwayat-saya') ? 'bg-[#2563eb] text-white shadow-md' : 'text-blue-100 hover:bg-white/10' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         <span class="text-sm font-medium">Riwayat Pinjaman</span>
                     </a>
-
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 {{ request()->routeIs('profile.edit') ? 'bg-[#2563eb] text-white shadow-md' : 'text-blue-100 hover:bg-white/10' }}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                         <span class="text-sm font-medium">Profil Siswa</span>
@@ -130,25 +123,33 @@
 
                         if(Auth::check()) {
                             if(Auth::user()->role === 'admin') {
-                                // Logika Admin (Tampilkan semua aktivitas terbaru dan yang terlambat)
-                                $notifCount = \App\Models\Transaction::where('status', 'dipinjam')
-                                                ->whereDate('return_date', '<', \Carbon\Carbon::today())
-                                                ->count();
-                                $recentNotifs = \App\Models\Transaction::with(['user', 'book'])->latest()->take(5)->get();
+                                // ADMIN: Munculkan yang butuh ACC & Terlambat
+                                $recentNotifs = \App\Models\Transaction::with(['user', 'book'])
+                                    ->whereIn('status', ['menunggu', 'menunggu_pengembalian'])
+                                    ->orWhere(function($query) {
+                                        $query->whereIn('status', ['dipinjam', 'menunggu_pengembalian'])
+                                              ->whereDate('return_date', '<', \Carbon\Carbon::today());
+                                    })
+                                    ->latest()->take(5)->get();
+                                $notifCount = $recentNotifs->count();
                             } else {
-                                // Logika Selain Admin / Siswa (Tampilkan aktivitasnya sendiri saja)
-                                $notifCount = \App\Models\Transaction::where('user_id', Auth::id())
-                                                ->where('status', 'dipinjam')
-                                                ->whereDate('return_date', '<', \Carbon\Carbon::today())
-                                                ->count();
+                                // SISWA: Munculkan 5 aktivitas terakhir apapun statusnya
                                 $recentNotifs = \App\Models\Transaction::with('book')
-                                                ->where('user_id', Auth::id())
-                                                ->latest()
-                                                ->take(5)
-                                                ->get();
+                                    ->where('user_id', Auth::id())
+                                    ->latest()->take(5)->get();
+                                
+                                // TITIK MERAH SISWA: Hanya nyala jika Ditolak atau Terlambat
+                                $notifCount = \App\Models\Transaction::where('user_id', Auth::id())
+                                    ->where(function($query) {
+                                        $query->where('status', 'ditolak')
+                                              ->orWhere(function($q) {
+                                                  $q->whereIn('status', ['dipinjam', 'menunggu_pengembalian'])
+                                                    ->whereDate('return_date', '<', \Carbon\Carbon::today());
+                                              });
+                                    })
+                                    ->count();
                             }
                         }
-                        
                     @endphp
 
                     <div class="relative flex items-center" x-data="{ openNotif: false }" @click.outside="openNotif = false">
@@ -174,51 +175,59 @@
                              style="display: none;">
                             
                             <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/80 flex justify-between items-center">
-                                <p class="text-sm font-bold text-gray-900">Aktivitas Terkini</p>
+                                <p class="text-sm font-bold text-gray-900">Notifikasi</p>
                                 @if($notifCount > 0)
-                                    <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-md">{{ $notifCount }} Terlambat!</span>
+                                    <span class="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-0.5 rounded-md">{{ $notifCount }} Perlu Perhatian</span>
                                 @endif
                             </div>
 
                             <div class="max-h-[320px] overflow-y-auto">
                                 @forelse($recentNotifs as $notif)
                                     @php
-                                        $isOverdue = $notif->status === 'dipinjam' && \Carbon\Carbon::parse($notif->return_date)->isPast();
+                                        $isOverdue = in_array($notif->status, ['dipinjam', 'menunggu_pengembalian']) && \Carbon\Carbon::parse($notif->return_date)->isPast();
                                     @endphp
-                                    <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors {{ $isOverdue ? 'bg-red-50/40' : '' }}">
+                                    <div class="px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors {{ $isOverdue || $notif->status == 'ditolak' ? 'bg-red-50/40' : 'bg-blue-50/20' }}">
                                         <div class="flex items-start gap-3">
-                                            <div class="mt-0.5 w-8 h-8 rounded-full flex items-center justify-center shrink-0 {{ $notif->status === 'dipinjam' ? 'bg-orange-100 text-orange-500' : 'bg-green-100 text-green-500' }}">
-                                                @if($notif->status === 'dipinjam')
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                @else
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                                @endif
+                                            <div class="mt-0.5 w-8 h-8 rounded-full flex items-center justify-center shrink-0 {{ $notif->status == 'ditolak' || $isOverdue ? 'bg-red-100 text-red-500' : 'bg-blue-100 text-blue-500' }}">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                                             </div>
                                             <div>
                                                 @if(Auth::user()->role === 'admin')
                                                     <p class="text-sm text-gray-800 leading-snug">
                                                         <span class="font-bold">{{ $notif->user->name }}</span> 
-                                                        {{ $notif->status === 'dipinjam' ? 'meminjam' : 'telah mengembalikan' }} 
+                                                        @if($notif->status === 'menunggu') mengajukan pinjaman
+                                                        @elseif($notif->status === 'menunggu_pengembalian') ingin menyerahkan
+                                                        @elseif($isOverdue) <span class="text-red-600">terlambat kembalikan</span>
+                                                        @endif
                                                         <span class="font-medium text-[#1e4ed8]">"{{ $notif->book->title }}"</span>
                                                     </p>
                                                 @else
                                                     <p class="text-sm text-gray-800 leading-snug">
-                                                        Anda {{ $notif->status === 'dipinjam' ? 'meminjam' : 'telah mengembalikan' }} 
-                                                        <span class="font-medium text-[#1e4ed8]">"{{ $notif->book->title }}"</span>
+                                                        @if($notif->status === 'menunggu')
+                                                            <span class="text-yellow-600 font-medium">Menunggu ACC:</span>
+                                                        @elseif($notif->status === 'dipinjam' && !$isOverdue)
+                                                            <span class="text-blue-600 font-medium">Sedang dipinjam:</span>
+                                                        @elseif($notif->status === 'menunggu_pengembalian')
+                                                            <span class="text-purple-600 font-medium">Menyerahkan:</span>
+                                                        @elseif($notif->status === 'dikembalikan')
+                                                            <span class="text-green-600 font-medium">Selesai:</span>
+                                                        @elseif($notif->status === 'ditolak')
+                                                            <span class="text-red-600 font-medium">Ditolak:</span>
+                                                        @elseif($isOverdue)
+                                                            <span class="text-red-600 font-bold">Terlambat:</span>
+                                                        @endif
+                                                        "{{ $notif->book->title }}"
                                                     </p>
                                                 @endif
                                                 <div class="flex items-center gap-2 mt-1">
                                                     <p class="text-[10px] text-gray-400">{{ \Carbon\Carbon::parse($notif->created_at)->diffForHumans() }}</p>
-                                                    @if($isOverdue)
-                                                        <span class="text-[10px] text-red-600 font-bold bg-red-100 px-1.5 py-0.5 rounded">Melewati Batas!</span>
-                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 @empty
                                     <div class="px-4 py-8 text-center flex flex-col items-center">
-                                        <p class="text-sm text-gray-500 font-medium">Belum ada aktivitas.</p>
+                                        <p class="text-sm text-gray-500 font-medium">Belum ada aktivitas terbaru.</p>
                                     </div>
                                 @endforelse
                             </div>
@@ -280,7 +289,7 @@
 
     @if (session('success'))
         <div x-data="{ show: true }"
-             x-init="setTimeout(() => show = false, 3000)"
+             x-init="setTimeout(() => show = false, 4000)"
              x-show="show"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 transform translate-x-8"
@@ -288,7 +297,7 @@
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 transform translate-x-0"
              x-transition:leave-end="opacity-0 transform translate-x-8"
-             class="fixed top-6 right-6 z-50 flex items-center w-full max-w-xs p-4 space-x-3 bg-white rounded-xl shadow-2xl border-l-4 border-green-500"
+             class="fixed top-24 right-6 z-50 flex items-center w-full max-w-xs p-4 space-x-3 bg-white rounded-xl shadow-2xl border-l-4 border-green-500"
              role="alert">
             <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg">
                 <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"><path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/></svg>
@@ -298,5 +307,27 @@
             </div>
         </div>
     @endif
+
+    @if (session('error'))
+        <div x-data="{ show: true }"
+             x-init="setTimeout(() => show = false, 5000)"
+             x-show="show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform translate-x-8"
+             x-transition:enter-end="opacity-100 transform translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 transform translate-x-0"
+             x-transition:leave-end="opacity-0 transform translate-x-8"
+             class="fixed top-24 right-6 z-50 flex items-center w-full max-w-xs p-4 space-x-3 bg-white rounded-xl shadow-2xl border-l-4 border-red-500"
+             role="alert">
+            <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </div>
+            <div class="ml-3 text-sm font-bold text-gray-700">
+                {{ session('error') }}
+            </div>
+        </div>
+    @endif
+
 </body>
 </html>

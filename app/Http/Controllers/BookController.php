@@ -13,22 +13,27 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Book::query();
+        $query = \App\Models\Book::with('category');
 
-        // Logika Fitur Pencarian
+        // Filter pencarian Admin
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('title', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
                   ->orWhere('author', 'like', "%{$search}%");
+            });
         }
 
-        // Logika Pagination
-        $books = $query->latest()->paginate(10);
-        $books->appends(['search' => $request->search]);
+        // Filter kategori Admin
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
 
-        return view('admin.books.index', compact('books'));
+        $books = $query->latest()->get();
+
+        // PASTIKAN BARIS INI MENGARAH KE ADMIN, BUKAN KATALOG
+        return view('admin.books.index', compact('books')); 
     }
-
     /**
      * Menampilkan halaman form tambah buku.
      */
@@ -73,9 +78,9 @@ class BookController extends Controller
      */
     public function edit($id)
     {
-        $book = Book::findOrFail($id);
-        // Ambil semua kategori juga untuk halaman edit
-        $categories = Category::all(); 
+        $book = \App\Models\Book::findOrFail($id);
+        $categories = \App\Models\Category::all(); 
+
         return view('admin.books.edit', compact('book', 'categories'));
     }
 

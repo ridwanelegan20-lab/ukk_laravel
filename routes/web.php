@@ -58,9 +58,11 @@ Route::get('/dashboard', function (Request $request) {
 Route::middleware('auth')->group(function () {
     
     // Halaman Katalog Buku Full
-    Route::get('/katalog', function (Request $request) {
-        $query = Book::where('stock', '>', 0);
+    Route::get('/katalog', function (\Illuminate\Http\Request $request) {
+        // Panggil relasi kategori agar ringan di database
+        $query = \App\Models\Book::with('category');
         
+        // 1. Filter Pencarian Judul/Penulis
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -69,18 +71,23 @@ Route::middleware('auth')->group(function () {
             });
         }
         
-        $books = $query->latest()->get();
-        return view('siswa.buku', compact('books'));
+        // 2. Filter Kategori (FITUR BARU)
+        if ($request->has('category') && $request->category != '') {
+            $query->where('category_id', $request->category);
+        }
+        
+        // Ambil data buku dengan pagination (12 buku per halaman)
+        $books = $query->latest()->paginate(12);
+        $books->appends($request->all()); // Agar filter tidak hilang saat pindah halaman
+        
+        // Ambil semua daftar kategori untuk isi Dropdown
+        $categories = \App\Models\Category::all();
+        
+        // PASTIKAN NAMA VIEW-NYA BENAR ('siswa.buku')
+        return view('siswa.buku', compact('books', 'categories'));
     });
 
-    // Halaman Riwayat Pinjaman Saya
-    Route::get('/riwayat-saya', function () {
-        $myTransactions = Transaction::where('user_id', Auth::id())
-                                     ->with('book')
-                                     ->latest()
-                                     ->get();
-        return view('siswa.riwayat', compact('myTransactions'));
-    });
+    // ... (biarkan rute riwayat atau rute lainnya di bawah ini tetap utuh)
 });
 
 // ==================================================================
@@ -108,6 +115,7 @@ Route::middleware(['auth', RoleMiddleware::class.':admin'])
     Route::put('transactions/{id}/approve', [TransactionController::class, 'approve'])->name('transactions.approve');
     Route::put('transactions/{id}/reject', [TransactionController::class, 'reject'])->name('transactions.reject');
     Route::put('transactions/{id}/approve-return', [TransactionController::class, 'approveReturn'])->name('transactions.approveReturn');
+    Route::post('transactions/{id}/remind', [TransactionController::class, 'sendReminder'])->name('transactions.remind');
     
     // --- CRUD Kategori ---
     Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');

@@ -110,12 +110,14 @@
                                     @if($trx->status === 'dikembalikan')
                                         {{ \Carbon\Carbon::parse($trx->updated_at)->format('d F Y') }}
                                     @else
-                                        <span class="text-orange-500">{{ \Carbon\Carbon::parse($trx->created_at)->addDays(7)->format('d F Y') }}</span>
+                                        <span class="text-orange-500">{{ \Carbon\Carbon::parse($trx->return_date)->format('d F Y') }}</span>
                                     @endif
                                 </td>
                                 
                                 <td class="px-6 py-4">
-                                    @if($trx->status === 'menunggu')
+                                    @if(in_array($trx->status, ['dipinjam', 'menunggu_pengembalian']) && \Carbon\Carbon::parse($trx->return_date)->isPast())
+                                        <span class="bg-red-100 text-red-700 text-[11px] font-bold px-3 py-1 rounded-md border border-red-300 shadow-sm animate-pulse">TERLAMBAT</span>
+                                    @elseif($trx->status === 'menunggu')
                                         <span class="bg-yellow-100 text-yellow-700 text-[11px] font-bold px-3 py-1 rounded-md border border-yellow-200 shadow-sm">Menunggu Pinjam</span>
                                     @elseif($trx->status === 'menunggu_pengembalian')
                                         <span class="bg-purple-100 text-purple-700 text-[11px] font-bold px-3 py-1 rounded-md border border-purple-200 shadow-sm">Proses Kembali</span>
@@ -129,6 +131,16 @@
                                 </td>
                                 
                                 <td class="px-6 py-4 flex items-center justify-center gap-2">
+                                    
+                                    @if(in_array($trx->status, ['dipinjam', 'menunggu_pengembalian']) && \Carbon\Carbon::parse($trx->return_date)->isPast())
+                                        <form action="{{ route('admin.transactions.remind', $trx->id) }}" method="POST" class="inline">
+                                            @csrf
+                                            <button type="submit" class="text-[10px] font-bold text-white bg-red-500 hover:bg-red-600 px-2 py-1.5 rounded border border-red-600 transition-colors shadow-sm" onclick="return confirm('Kirim peringatan via WhatsApp ke siswa ini?')">
+                                                WA Peringatan
+                                            </button>
+                                        </form>
+                                    @endif
+
                                     @if($trx->status == 'menunggu')
                                         <form action="{{ route('admin.transactions.approve', $trx->id) }}" method="POST" class="inline">
                                             @csrf @method('PUT')
@@ -145,10 +157,13 @@
                                                 Terima Buku
                                             </button>
                                         </form>
+                                    @elseif($trx->status == 'dipinjam')
+                                        <span class="text-[10px] text-gray-400 italic">Belum diserahkan</span>
                                     @else
                                         <span class="text-[10px] text-gray-400 italic bg-gray-50 px-2 py-1 rounded border border-gray-100">Selesai</span>
                                     @endif
                                 </td>
+
                             </tr>
                         @empty
                             <tr>

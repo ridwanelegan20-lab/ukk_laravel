@@ -154,4 +154,26 @@ class TransactionController extends Controller
             } catch (\Exception $e) { \Log::error('WA Gagal: ' . $e->getMessage()); }
         }
     }
+    // ====================================================================
+    // FITUR BARU: Admin Mengirim Peringatan Keterlambatan
+    // ====================================================================
+    public function sendReminder($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+
+        // Hitung sudah terlambat berapa hari
+        $batasWaktu = Carbon::parse($transaction->return_date);
+        $terlambatHari = $batasWaktu->diffInDays(Carbon::now());
+
+        $pesan = "⚠️ *PERINGATAN KETERLAMBATAN* ⚠️\n\n";
+        $pesan .= "Halo *{$transaction->user->name}*,\n\n";
+        $pesan .= "Sistem kami mencatat bahwa masa peminjaman buku *{$transaction->book->title}* telah habis pada " . $batasWaktu->format('d M Y') . ".\n\n";
+        $pesan .= "Buku ini telah terlambat selama *{$terlambatHari} hari*.\n\n";
+        $pesan .= "Harap SEGERA mengembalikan buku tersebut ke perpustakaan hari ini juga untuk menghindari denda atau sanksi lebih lanjut. Terima kasih!";
+
+        // Gunakan fungsi kirimWA yang sudah kita buat sebelumnya
+        $this->kirimWA($transaction->user->phone_number, $pesan);
+
+        return back()->with('success', 'Pesan peringatan WhatsApp berhasil dikirim ke siswa!');
+    }
 }

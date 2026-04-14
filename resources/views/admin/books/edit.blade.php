@@ -32,17 +32,22 @@
                     </div>
 
                     <div>
-                        <label for="category" class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
-                        <select name="category" id="category" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer">
-                            <option value="Fiksi" selected>Fiksi</option>
-                            <option value="Sejarah">Sejarah</option>
-                            <option value="Motivasi">Motivasi</option>
+                        <label for="category_id" class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
+                        <select name="category_id" id="category_id" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer">
+                            <option value="" disabled>Pilih Kategori...</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}" {{ old('category_id', $book->category_id) == $cat->id ? 'selected' : '' }}>
+                                    {{ $cat->name }}
+                                </option>
+                            @endforeach
                         </select>
+                        @error('category_id') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label for="year" class="block text-sm font-semibold text-gray-700 mb-1">Tahun Terbit</label>
-                        <input type="number" name="year" id="year" value="2023" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <input type="number" name="year" id="year" value="{{ old('year', $book->year) }}" class="block w-full px-4 py-2.5 text-gray-900 bg-gray-50 border border-gray-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        @error('year') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
@@ -57,11 +62,11 @@
 
                 <div class="flex items-center justify-end gap-3">
                     <a href="{{ route('admin.books.index') }}" class="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                        Batal>
+                        Batal
                     </a>
                     <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-[#1e4ed8] rounded-lg hover:bg-blue-800 shadow-sm transition-colors flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        Perbarui Data>
+                        Perbarui Data
                     </button>
                 </div>
             </form>

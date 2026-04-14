@@ -14,24 +14,24 @@ class MemberController extends Controller
      */
     public function index(Request $request)
     {
-        // Kita hanya mengambil user yang memiliki role 'siswa' (bukan admin)
-        $query = User::where('role', 'siswa');
+        $query = \App\Models\User::query();
 
-        // Logika Fitur Pencarian
+        // Fitur Pencarian Nama/Email
         if ($request->filled('search')) {
             $search = $request->search;
-            // Gunakan kurung tambahan (Closure) agar pencarian tidak merusak filter role='siswa'
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        // Logika Pagination
+        // Fitur Filter Role (Admin/Siswa)
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
         $members = $query->latest()->paginate(10);
-        
-        // Memastikan parameter pencarian tidak hilang saat pindah halaman
-        $members->appends(['search' => $request->search]);
+        $members->appends($request->all());
 
         return view('admin.members.index', compact('members'));
     }

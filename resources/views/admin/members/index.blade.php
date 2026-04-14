@@ -13,7 +13,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Total Anggota</p>
-                    <h3 class="text-xl font-bold text-gray-900">356</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format(\App\Models\User::count()) }}</h3>
                     <p class="text-[10px] text-gray-400 mt-0.5">Semua anggota</p>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Aktif</p>
-                    <h3 class="text-xl font-bold text-gray-900">342</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format(\App\Models\User::whereNotNull('email')->count()) }}</h3>
                     <p class="text-[10px] text-gray-400 mt-0.5">Anggota aktif</p>
                 </div>
             </div>
@@ -34,9 +34,9 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                 </div>
                 <div>
-                    <p class="text-xs text-gray-500 font-medium">Nonaktif</p>
-                    <h3 class="text-xl font-bold text-gray-900">14</h3>
-                    <p class="text-[10px] text-gray-400 mt-0.5">Akses diblokir</p>
+                    <p class="text-xs text-gray-500 font-medium">Siswa Terdaftar</p>
+                    <h3 class="text-xl font-bold text-gray-900">{{ number_format(\App\Models\User::where('role', 'siswa')->count()) }}</h3>
+                    <p class="text-[10px] text-gray-400 mt-0.5">Berstatus siswa</p>
                 </div>
             </div>
 
@@ -46,7 +46,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 font-medium">Role Akun</p>
-                    <h3 class="text-xl font-bold text-gray-900">2</h3>
+                    <h3 class="text-xl font-bold text-gray-900">{{ \App\Models\User::select('role')->distinct()->count() }}</h3>
                     <p class="text-[10px] text-gray-400 mt-0.5">Admin & Siswa</p>
                 </div>
             </div>
@@ -56,17 +56,17 @@
             
             <div class="p-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white">
                 <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <form method="GET" action="{{ route('admin.members.index') }}" class="relative w-full sm:w-64">
+                    <form method="GET" action="{{ route('admin.members.index') }}" class="relative w-full sm:w-64" id="memberFilterForm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama atau email..." class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-gray-50 transition-colors">
                     </form>
                     
-                    <select class="block w-full sm:w-40 py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-600 cursor-pointer">
-                        <option>Status: Semua</option>
-                        <option>Aktif</option>
-                        <option>Nonaktif</option>
+                    <select name="role" onchange="document.getElementById('memberFilterForm').submit();" form="memberFilterForm" class="block w-full sm:w-40 py-2 px-3 border border-gray-200 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-600 cursor-pointer">
+                        <option value="">Semua Role</option>
+                        <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="siswa" {{ request('role') == 'siswa' ? 'selected' : '' }}>Siswa</option>
                     </select>
                 </div>
 
@@ -92,7 +92,7 @@
                     <tbody class="divide-y divide-gray-100">
                         @forelse($members ?? [] as $index => $member)
                             <tr class="hover:bg-gray-50/50 transition-colors bg-white">
-                                <td class="px-6 py-4 text-gray-500">{{ $index + 1 }}</td>
+                                <td class="px-6 py-4 text-gray-500">{{ ($members->currentPage() - 1) * $members->perPage() + $index + 1 }}</td>
                                 
                                 <td class="px-6 py-4">
                                     <p class="font-bold text-gray-900">{{ $member->name }}</p>
@@ -105,9 +105,19 @@
                                     <span class="bg-green-50 text-green-600 text-[11px] font-bold px-2.5 py-1 rounded-md border border-green-100">Aktif</span>
                                 </td>
                                 
-                                <td class="px-6 py-4">{{ $member->created_at->format('d M Y') ?? '10 Apr 2026' }}</td>
+                                <td class="px-6 py-4">{{ $member->created_at->format('d M Y') }}</td>
                                 
-                                <td class="px-6 py-4 font-medium">0</td> <td class="px-6 py-4 flex items-center justify-center gap-2 mt-2">
+                                <td class="px-6 py-4 font-medium text-blue-600">
+                                    @php
+                                        // Menghitung berapa buku yang statusnya 'dipinjam' atau 'menunggu_pengembalian' oleh user ini
+                                        $pinjamCount = \App\Models\Transaction::where('user_id', $member->id)
+                                                        ->whereIn('status', ['dipinjam', 'menunggu_pengembalian'])
+                                                        ->count();
+                                    @endphp
+                                    {{ $pinjamCount }} Buku
+                                </td> 
+
+                                <td class="px-6 py-4 flex items-center justify-center gap-2 mt-2">
                                     <a href="{{ route('admin.members.edit', $member->id) }}" class="text-[11px] font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md border border-blue-100 transition-colors">
                                         Edit
                                     </a>
