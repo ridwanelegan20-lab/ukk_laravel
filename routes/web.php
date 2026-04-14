@@ -71,7 +71,7 @@ Route::middleware('auth')->group(function () {
             });
         }
         
-        // 2. Filter Kategori (FITUR BARU)
+        // 2. Filter Kategori
         if ($request->has('category') && $request->category != '') {
             $query->where('category_id', $request->category);
         }
@@ -83,11 +83,21 @@ Route::middleware('auth')->group(function () {
         // Ambil semua daftar kategori untuk isi Dropdown
         $categories = \App\Models\Category::all();
         
-        // PASTIKAN NAMA VIEW-NYA BENAR ('siswa.buku')
         return view('siswa.buku', compact('books', 'categories'));
     });
 
-    // ... (biarkan rute riwayat atau rute lainnya di bawah ini tetap utuh)
+    // ==================================================
+    // FITUR BARU: Halaman Riwayat Pinjaman Siswa
+    // ==================================================
+    Route::get('/riwayat-saya', function () {
+        $transactions = \App\Models\Transaction::with('book')
+                            ->where('user_id', \Illuminate\Support\Facades\Auth::id())
+                            ->latest()
+                            ->paginate(10);
+                            
+        return view('siswa.riwayat', compact('transactions'));
+    });
+
 });
 
 // ==================================================================
