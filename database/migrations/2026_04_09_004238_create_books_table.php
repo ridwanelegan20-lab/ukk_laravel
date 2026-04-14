@@ -17,6 +17,7 @@ return new class extends Migration
         $table->string('title');
         $table->string('author');
         $table->integer('stock'); // Penting untuk validasi peminjaman
+        $table->string('image')->nullable(); // Pastikan baris ini ada
         $table->timestamps();
     });
     }
