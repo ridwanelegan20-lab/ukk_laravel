@@ -20,7 +20,7 @@
                             <th class="px-6 py-4 font-medium">Tgl Pengajuan</th>
                             <th class="px-6 py-4 font-medium">Batas Kembali</th>
                             <th class="px-6 py-4 font-medium">Status</th>
-                        </tr>
+                            <th class="px-6 py-4 font-medium text-center">Aksi</th> </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($transactions as $index => $trx)
@@ -63,10 +63,25 @@
                                         <span class="bg-gray-100 text-gray-600 text-[11px] font-bold px-3 py-1.5 rounded-md border border-gray-200">Ditolak</span>
                                     @endif
                                 </td>
+
+                                <td class="px-6 py-4 text-center">
+                                    @if($trx->status === 'dipinjam')
+                                        <form action="{{ route('transactions.return', $trx->id) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <button type="submit" class="text-[11px] font-bold text-white bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded-md transition-colors shadow-sm" onclick="return confirm('Yakin ingin mengembalikan buku ini sekarang? Pastikan Anda juga menyerahkan fisik bukunya ke Admin.')">
+                                                Kembalikan
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-gray-400 text-xs italic">-</span>
+                                    @endif
+                                </td>
+
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-gray-500">
+                                <td colspan="6" class="px-6 py-10 text-center text-gray-500">
                                     <div class="flex flex-col items-center justify-center">
                                         <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                         <p>Anda belum memiliki riwayat peminjaman buku.</p>
