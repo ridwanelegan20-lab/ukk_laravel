@@ -146,5 +146,9 @@ Route::middleware(['auth'])->group(function () {
     // Mengembalikan buku
     Route::put('/transactions/return/{id}', [TransactionController::class, 'returnBook'])->name('transactions.return');
 });
+Route::get('/buat-symlink', function () {
+    \Illuminate\Support\Facades\Artisan::call('storage:link');
+    return 'Symlink berhasil dibuat!';
+});
 
 require __DIR__.'/auth.php';
